@@ -27,13 +27,17 @@ To get this project up and running on your local machine, follow these steps:
 
 2. **Navigate to the Project Directory and Run the Two Docker Compose Files**:
    ```docker-compose up --build -d
+   
    ./pythonscripts/docker-compose up --build -d
 
 3. **Open InfluxDB UI and get the API Token and update it in the script files**:
    ```Open your browser and go to http://localhost:3000
+
    Login with the Username ADMIN_USERNAME and password ADMIN_PASSWORD
    Go to the bitcoinprice bucket and create the API Token and replace the apitoken in the InfluxDBPusher.py 
 
 4. **Open Grafana Web UI and configure the Datasource**:
-   ```Open your browser and go to http://localhost:3000. Log in with the default credentials (admin,admin) to access the dashboards.
-   Configure the datasource with username, password and API Token.git 
+   ```Open your browser and go to http://localhost:3000.
+
+   Log in with the default credentials (admin,admin) to access the dashboards.
+   Configure the datasource with username, password and API Token. 
