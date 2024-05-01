@@ -1,0 +1,2 @@
+# CoinCapPriceDashboard
+Coincap prices dashboard
