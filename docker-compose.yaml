@@ -1,0 +1,99 @@
+version: "3"
+
+networks:
+  loki:
+    external: true
+
+services:
+  loki:
+    image: grafana/loki:2.9.0
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - loki
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    volumes:
+      - /var/log:/var/log
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - loki
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        mkdir -p /etc/grafana/provisioning/datasources
+        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
+        apiVersion: 1
+        datasources:
+        - name: Loki
+          type: loki
+          access: proxy
+          orgId: 1
+          url: http://loki:3100
+          basicAuth: false
+          isDefault: true
+          version: 1
+          editable: false
+        EOF
+        /run.sh
+    ports:
+      - "3000:3000"
+    networks:
+      - loki
+  
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - loki
+  telegraf:
+    image: telegraf
+    container_name: telegraf
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on:
+      - influxdb
+    ports:
+      - 8125:8125
+    networks:
+      - loki
+  influxdb:
+    image: influxdb:2
+    ports:
+      - "8086:8086"
+    volumes:
+      - ./influxdb2-data:/var/lib/influxdb2
+      - ./influxdb2-config:/etc/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=ADMIN_USERNAME  # Replace with actual username
+      - DOCKER_INFLUXDB_INIT_PASSWORD=ADMIN_PASSWORD  # Replace with actual password
+      - DOCKER_INFLUXDB_INIT_ORG=ORG_NAME  # Replace with actual organization name
+      - DOCKER_INFLUXDB_INIT_BUCKET=BUCKET_NAME  # Replace with actual bucket name
+    networks:
+      - loki
+  # pusherapp:
+  #   image:  secondbuild
+  #   # build: ./pythonscripts
+  #   container_name: secondbuild
+  #   environment:
+  #     - INFLUXDB_HOST=influxdb
+  #     - INFLUXDB_PORT=8086
+  #   networks:
+  #     - loki
+  #   depends_on:
+  #     - influxdb
+

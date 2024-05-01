@@ -1,0 +1,17 @@
+version: '3.8'
+
+networks:
+  loki:
+    external: true
+services:
+  app:
+    # image: secondbuild
+    build: .
+    volumes:
+      - .:/app
+    # ports:
+    #   - "8000:8000"  # Map ports if needed, change if your app uses different ports
+    environment:
+      - TOKEN=novalu
+    networks:
+      - loki
