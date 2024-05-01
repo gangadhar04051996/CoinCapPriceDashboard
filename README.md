@@ -27,8 +27,7 @@ To get this project up and running on your local machine, follow these steps:
 
 2. **Navigate to the Project Directory and Run the Two Docker Compose Files**:
    ```docker-compose up --build -d
-
-./pythonscripts/docker-compose up --build -d
+   ./pythonscripts/docker-compose up --build -d
 
 3. **Open InfluxDB UI and get the API Token and update it in the script files**:
    ```Open your browser and go to http://localhost:3000
